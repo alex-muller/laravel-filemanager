@@ -1,0 +1,11 @@
+{
+    "name": "alex-muller/filemanager",
+    "description": "Simple File Manager with pagination",
+    "authors": [
+        {
+            "name": "Alex Muller",
+            "email": "mullerbox@gmail.com"
+        }
+    ],
+    "require": {}
+}
