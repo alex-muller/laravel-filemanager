@@ -23,7 +23,7 @@ class Item
         }
 
         $file = Storage::get($file_path);
-        $type = mime_content_type(storage_path($file_path));
+        $type = mime_content_type( Items::storagePath($file_path));
 
         $response = Response::make($file);
         $response->header('Content-Type', $type);

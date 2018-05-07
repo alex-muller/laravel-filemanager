@@ -16,9 +16,9 @@ class Items
     public static function remove($paths)
     {
         foreach ($paths as $path){
-            if(is_file(storage_path($path))){
+            if(is_file(self::storagePath($path))){
                 Storage::delete($path);
-            }else{
+            }elseif(is_dir(self::storagePath($path))){
                 Storage::deleteDirectory($path);
             }
         }
@@ -101,7 +101,8 @@ class Items
 
     protected static function getItemType($path)
     {
-        $type = mime_content_type(storage_path($path));
+
+        $type = mime_content_type(self::storagePath( $path));
 
         if ($type == 'directory') return $type;
 
@@ -112,6 +113,11 @@ class Items
         }
 
         return $type;
+    }
+
+    public static function storagePath($path = '')
+    {
+        return Storage::disk('local')->getDriver()->getAdapter()->getPathPrefix() . '/' . $path;
     }
 
 

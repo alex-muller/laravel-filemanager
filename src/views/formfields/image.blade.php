@@ -1,6 +1,6 @@
 <div class="form-group">
   <input
-      class="form-control"
+      class="form-control amfm-link"
       name="{{ $row->field }}"
       data-name="{{ $row->display_name }}"
       type="text"

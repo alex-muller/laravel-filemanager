@@ -1,4 +1,5 @@
 var amfm = new function () {
+
   this.init = function () {
     openWindowInit();
     console.log('amfm.init');
@@ -6,12 +7,12 @@ var amfm = new function () {
 
   this.tinyMCE = function (field, type) {
     openWindow(type, function (path) {
-      return field.value = '/'+amfmPrefix + '/' + path;
+      return field.value = '/amfm/' + path;
     })
   };
 
   function openWindow(type, callback) {
-    var url = '/' + amfmPrefix;
+    var url = '/amfm';
     var win = window.open(url, "AMFM", "width=800,height=600");
     win.onload = function () {
       var selector = type == 'image' ? 'a[data-type=image]' : 'a[data-type]';
@@ -32,7 +33,7 @@ var amfm = new function () {
       }
       openWindow(type, function (path) {
         if(type == 'image'){
-          $(link).css('background-image', 'url("/'+amfmPrefix+'/'+path+'")');
+          $(link).css('background-image', 'url("/amfm/'+path+'")');
         }
         $(link).closest('div').find('input').val(path)
 
