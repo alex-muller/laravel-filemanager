@@ -2,7 +2,7 @@
 return[
 
     'prefix' => 'amfm',
-    'path' => 'files',
+    'path' => 'public',
     'paging' => 24,
     'guard' => 'admin', //default web
 
