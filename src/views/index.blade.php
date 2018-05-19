@@ -47,6 +47,15 @@
   </div>
   <div class="section section-content">
     <div v-for="chunk in chunks" class="row">
+
+      {{--Breadcrumbs--}}
+      <ol class="breadcrumb">
+        <li v-for="(breadcrumb, index) in breadcrumbs" :key="index" :class="{active: breadcrumb.isActive}">
+          <a @click="changePath(breadcrumb.path)" v-if="!breadcrumb.isActive">@{{ breadcrumb.name }}</a>
+          <span v-else>@{{ breadcrumb.name }}</span>
+        </li>
+      </ol>
+
       <div v-for="item in chunk" class="col-sm-2 col-xs-4 text-center item">
         <a v-if="item.type == 'directory'" class="thumbnail" @click="changePath(item.path)"><i class="fa fa-folder fa-5x"></i></a>
         <a v-else-if="item.type == 'image'" data-type="image" :data-path="item.path" class="thumbnail"><img :src="'{{ config('amfm.prefix') }}/' + item.path" ></a>
@@ -111,7 +120,7 @@
     var vueData = {
       items: {},
       pagination: {},
-      path: '{{ config('amfm.path') }}',
+      path: window.localStorage.getItem('path') ? window.localStorage.getItem('path') : '{{ config('amfm.path') }}',
       newDirectoryName: '',
       checked: [],
       searchPhrase: ''
@@ -120,8 +129,13 @@
       el: '#app',
       data: vueData,
       mounted: function () {
-        this.getItems();
+        this.getItems(this.path);
         this.uploadFilesInit();
+      },
+      watch: {
+        path: function (path) {
+          window.localStorage.setItem('path', path);
+        }
       },
       methods: {
         getItems: function (path, page, search) {
@@ -271,6 +285,22 @@
       computed: {
         chunks: function () {
           return _.chunk(this.items, 6)
+        },
+        breadcrumbs: function () {
+          var links = [];
+          var path = '';
+          var linkNames = this.path.split('/').filter(function (item) {
+            return !!item;
+          });
+          var i = 0;
+          linkNames.forEach(function(linkName){
+            if(linkName){
+              i++;
+              path += linkName + '/';
+              links.push({name: linkName, path: path, isActive: (i == linkNames.length)})
+            }
+          });
+          return links;
         }
       }
     });
