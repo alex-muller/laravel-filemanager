@@ -1,11 +1,24 @@
 {
-    "name": "alex-muller/filemanager",
+    "name": "alex-muller/laravel-file-manager",
     "description": "Simple File Manager with pagination",
+    "version": "0.1.0",
     "authors": [
         {
             "name": "Alex Muller",
             "email": "mullerbox@gmail.com"
         }
     ],
-    "require": {}
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "AlexMuller\\Filemanager\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "AlexMuller\\Filemanager\\AMServiceProvider"
+            ]
+        }
+    }
 }
