@@ -2,6 +2,7 @@ var amfm = new function () {
 
   this.init = function () {
     openWindowInit();
+    multipleImageInit();
     removeImageInit();
     console.log('amfm.init');
   };
@@ -38,6 +39,7 @@ var amfm = new function () {
     $('body').on('click', '.amfm-link', function () {
       var link = this;
       var type = 'file';
+
       if($(link).hasClass('amfm-image')){
         type = 'image';
       }
@@ -46,10 +48,16 @@ var amfm = new function () {
           $(link).css('background-image', 'url("/amfm/'+path+'")');
         }
         console.log(link);
-        $(link).closest('.amfm').find('input').val(path)
+
+        selectFile(link, path)
       })
     })
   }
+
+  function selectFile(link, path) {
+    $(link).closest('.amfm').find('input').val(path)
+  }
+
 };
 
 $(function () {

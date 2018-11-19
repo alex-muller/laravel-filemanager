@@ -31,7 +31,7 @@
           </span>
         </div><!-- /input-group -->
       </div>
-      <form  id="files-upload" style="display: none">
+      <form id="files-upload" style="display: none">
         {{ csrf_field() }}
         <input type="file" name="files[]" multiple>
       </form>
@@ -46,19 +46,19 @@
     </div>
   </div>
   <div class="section section-content">
-    <div v-for="chunk in chunks" class="row">
+    {{--Breadcrumbs--}}
+    <ol class="breadcrumb">
+      <li v-for="(breadcrumb, index) in breadcrumbs" :key="index" :class="{active: breadcrumb.isActive}">
+        <a @click="changePath(breadcrumb.path)" v-if="!breadcrumb.isActive">@{{ breadcrumb.name }}</a>
+        <span v-else>@{{ breadcrumb.name }}</span>
+      </li>
+    </ol>
 
-      {{--Breadcrumbs--}}
-      <ol class="breadcrumb">
-        <li v-for="(breadcrumb, index) in breadcrumbs" :key="index" :class="{active: breadcrumb.isActive}">
-          <a @click="changePath(breadcrumb.path)" v-if="!breadcrumb.isActive">@{{ breadcrumb.name }}</a>
-          <span v-else>@{{ breadcrumb.name }}</span>
-        </li>
-      </ol>
+    <div v-for="chunk in chunks" class="row">
 
       <div v-for="item in chunk" class="col-sm-2 col-xs-4 text-center item">
         <a v-if="item.type == 'directory'" class="thumbnail" @click="changePath(item.path)"><i class="fa fa-folder fa-5x"></i></a>
-        <a v-else-if="item.type == 'image'" data-type="image" :data-path="item.path" class="thumbnail"><img :src="'{{ config('amfm.prefix') }}/' + item.path" ></a>
+        <a v-else-if="item.type == 'image'" data-type="image" :data-path="item.path" class="thumbnail"><img :src="'{{ config('amfm.prefix') }}/' + item.path"></a>
         <a v-else class="thumbnail" data-type="file" :data-path="item.path"><i class="fa fa-file fa-5x file"></i></a>
         <label>
           <input type="checkbox" :value="item.path" v-model="checked"> @{{ item.name }}
@@ -75,10 +75,10 @@
   <nav v-if="pages > 1" aria-label="Page navigation" class="text-center">
     <ul class="pagination">
       <li>
-        <a  aria-label="Previous" @click="goto(currentPage - 20)">
+        <a aria-label="Previous" @click="goto(currentPage - 20)">
           <span aria-hidden="true">&laquo;&laquo;</span>
         </a>
-        <a  aria-label="Previous" @click="goto(currentPage - 1)">
+        <a aria-label="Previous" @click="goto(currentPage - 1)">
           <span aria-hidden="true">&laquo;</span>
         </a>
       </li>
@@ -100,210 +100,209 @@
   window.addEventListener('load', function () {
     /*Component Paginator*/
     Vue.component('paginator', {
-      props: ['pages', 'currentPage'],
+      props   : ['pages', 'currentPage'],
       template: $('#paginator').html(),
-      methods: {
-        goto: function (page) {
-          if(page < 1){
+      methods : {
+        goto        : function (page) {
+          if (page < 1) {
             page = 1
-          }else if(page > this.pages){
+          } else if (page > this.pages) {
             page = this.pages
           }
           this.$emit('change', {page: page})
         },
         isActivePage: function (page) {
-          return this.currentPage == page;
+          return this.currentPage == page
         }
       }
-    });
+    })
     /*Vue*/
     var vueData = {
-      items: {},
-      pagination: {},
-      path: window.localStorage.getItem('path') ? window.localStorage.getItem('path') : '{{ config('amfm.path') }}',
+      items           : {},
+      pagination      : {},
+      path            : window.localStorage.getItem('path') ? window.localStorage.getItem('path') : '{{ config('amfm.path') }}',
       newDirectoryName: '',
-      checked: [],
-      searchPhrase: ''
-    };
+      checked         : [],
+      searchPhrase    : ''
+    }
     new Vue({
-      el: '#app',
-      data: vueData,
-      mounted: function () {
-        this.getItems(this.path);
-        this.uploadFilesInit();
+      el      : '#app',
+      data    : vueData,
+      mounted : function () {
+        this.getItems(this.path)
+        this.uploadFilesInit()
       },
-      watch: {
+      watch   : {
         path: function (path) {
-          window.localStorage.setItem('path', path);
+          window.localStorage.setItem('path', path)
         }
       },
-      methods: {
-        getItems: function (path, page, search) {
-          var vue = this;
-          var params = {};
-          var items;
-          if(path !== undefined){
-            params.path = path;
-            this.path = path;
+      methods : {
+        getItems        : function (path, page, search) {
+          var vue = this
+          var params = {}
+          var items
+          if (path !== undefined) {
+            params.path = path
+            this.path = path
           }
-          if(search !== undefined){
-            params.search = search;
+          if (search !== undefined) {
+            params.search = search
           }
-          if(page !== undefined){
-            params.page = page;
+          if (page !== undefined) {
+            params.page = page
           }
           $.ajax({
-            url: '{{ route('amfm.get-items') }}',
-            data: params,
+            url       : '{{ route('amfm.get-items') }}',
+            data      : params,
             beforeSend: function () {
-              vue.preloader(true);
+              vue.preloader(true)
             },
-            success: function (res) {
-              vue.preloader(false);
-              vue.items = res.items;
-              vue.pagination = res.pagination;
+            success   : function (res) {
+              vue.preloader(false)
+              vue.items = res.items
+              vue.pagination = res.pagination
             }
-          });
+          })
         },
-        preloader: function (status) {
-          if(status){
+        preloader       : function (status) {
+          if (status) {
             $('.preloader').addClass('active')
-          }else{
+          } else {
             $('.preloader').removeClass('active')
           }
         },
-        changePage: function (payload) {
+        changePage      : function (payload) {
           this.getItems(this.path, payload.page, this.searchPhrase)
         },
-        changePath: function (path) {
-          this.path = path;
+        changePath      : function (path) {
+          this.path = path
           this.getItems(path)
         },
-        levelUp: function () {
-          var paths = this.path.split('/');
+        levelUp         : function () {
+          var paths = this.path.split('/')
 
-          if(paths.length > 1){
-            paths.splice(-1, 1);
-            url = paths.join('/');
-            this.getItems(url, 1);
+          if (paths.length > 0) {
+            paths.splice(-1, 1)
+            url = paths.join('/')
+            this.getItems(url, 1)
           }
         },
         showCreateFolder: function () {
-          $('#create-folder').fadeToggle();
-        },        
-        createDirectory: function () {
-          var vue = this;
+          $('#create-folder').fadeToggle()
+        },
+        createDirectory : function () {
+          var vue = this
           $.ajax({
-            url:'{{ route('amfm.create-directory') }}',
-            method: 'post',
-            data: {path: this.path, name: this.newDirectoryName},
+            url       : '{{ route('amfm.create-directory') }}',
+            method    : 'post',
+            data      : {path: this.path, name: this.newDirectoryName},
             beforeSend: function () {
-              vue.preloader(true);
+              vue.preloader(true)
             },
-            success: function (res) {
-              vue.preloader(false);
-              if(res.status == 'success'){
-                alert(res.message);
-                vue.showCreateFolder();
-                vue.newDirectoryName = '';
-                vue.reload();
-              }else{
+            success   : function (res) {
+              vue.preloader(false)
+              if (res.status == 'success') {
+                alert(res.message)
+                vue.showCreateFolder()
+                vue.newDirectoryName = ''
+                vue.reload()
+              } else {
                 alert('Error')
               }
             }
-          });
-        },
-        reload: function () {
-          this.getItems(this.path)
-        },
-        uploadFilesInit: function () {
-          var vue = this;
-          var $form = $('#files-upload');
-          var $filesInput = $('#files-upload input[type=file]');
-          $filesInput.on('change', function () {
-            var formData = new FormData($form.get(0));
-            formData.append('path', vue.path);
-            $.ajax({
-              url: '{{ route('amfm.upload-file') }}',
-              method: 'post',
-              contentType: false,
-              processData: false,
-              data: formData,
-              dataType: 'json',
-              beforeSend: function () {
-                vue.preloader(true);
-              },
-              success: function (res) {
-                vue.preloader(false);
-                if(res.status = 'success'){
-                 alert(res.message)
-                 vue.reload();
-               }else{
-                 alert('error')
-               }
-              }
-            });
           })
         },
-        uploadFiles: function () {
-          var $filesInput = $('#files-upload input[type=file]');
+        reload          : function () {
+          this.getItems(this.path)
+        },
+        uploadFilesInit : function () {
+          var vue = this
+          var $form = $('#files-upload')
+          var $filesInput = $('#files-upload input[type=file]')
+          $filesInput.on('change', function () {
+            var formData = new FormData($form.get(0))
+            formData.append('path', vue.path)
+            $.ajax({
+              url        : '{{ route('amfm.upload-file') }}',
+              method     : 'post',
+              contentType: false,
+              processData: false,
+              data       : formData,
+              dataType   : 'json',
+              beforeSend : function () {
+                vue.preloader(true)
+              },
+              success    : function (res) {
+                vue.preloader(false)
+                if (res.status = 'success') {
+                  alert(res.message)
+                  vue.reload()
+                } else {
+                  alert('error')
+                }
+              }
+            })
+          })
+        },
+        uploadFiles     : function () {
+          var $filesInput = $('#files-upload input[type=file]')
           $filesInput.trigger('click')
         },
-        removeItems: function () {
-          if(this.checked.length){
-              var vue = this;
-              var paths = this.checked;
-              var token = '{{ csrf_token() }}';
-              var result = confirm('Удалить отмеченные элементы?');
-              if(result)
-              {
-                $.ajax({
-                  url: '{{ route('amfm.remove') }}',
-                  method: 'post',
-                  data: {paths: paths, _token: token},
-                  beforeSend: function () {
-                    vue.preloader(true);
-                  },
-                  success: function (res) {
-                    vue.preloader(false);
-                    if(res.status == 'success'){
-                      alert(res.message);
-                    }else{
-                      alert('error')
-                    }
-                    vue.checked = [];
-                    vue.reload();
+        removeItems     : function () {
+          if (this.checked.length) {
+            var vue = this
+            var paths = this.checked
+            var token = '{{ csrf_token() }}'
+            var result = confirm('Удалить отмеченные элементы?')
+            if (result) {
+              $.ajax({
+                url       : '{{ route('amfm.remove') }}',
+                method    : 'post',
+                data      : {paths: paths, _token: token},
+                beforeSend: function () {
+                  vue.preloader(true)
+                },
+                success   : function (res) {
+                  vue.preloader(false)
+                  if (res.status == 'success') {
+                    alert(res.message)
+                  } else {
+                    alert('error')
                   }
-                });
-              }
+                  vue.checked = []
+                  vue.reload()
+                }
+              })
+            }
           }
         },
-        search: function () {
+        search          : function () {
           this.getItems(this.path, 1, this.searchPhrase)
         }
       },
       computed: {
-        chunks: function () {
+        chunks     : function () {
           return _.chunk(this.items, 6)
         },
         breadcrumbs: function () {
-          var links = [];
-          var path = '';
+          var links = []
+          var path = ''
           var linkNames = this.path.split('/').filter(function (item) {
-            return !!item;
-          });
-          var i = 0;
-          linkNames.forEach(function(linkName){
-            if(linkName){
-              i++;
-              path += linkName + '/';
+            return !!item
+          })
+          var i = 0
+          linkNames.forEach(function (linkName) {
+            if (linkName) {
+              i++
+              path += linkName + '/'
               links.push({name: linkName, path: path, isActive: (i == linkNames.length)})
             }
-          });
-          return links;
+          })
+          return links
         }
       }
-    });
+    })
   })
 </script>
 

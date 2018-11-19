@@ -17,62 +17,79 @@ class ItemsController extends Controller
         $this->middleware('auth')->except('getItem');
     }
 
-  public function getItems()
-  {
-      $path = request('path') ?: config('amfm.path');
-      $page = request('page') ?: 1;
-      $search = request('search') ? : '';
-      $items = Items::getItems($path, $page, $search);
-      return response()->json($items);
-  }
+    public function getItems()
+    {
+        $path   = request('path') ?: config('amfm.path');
+        $page   = request('page') ?: 1;
+        $search = request('search') ?: '';
+        $items  = Items::getItems($path, $page, $search);
 
-  public function createDirectory()
-  {
-      if(Item::createDirectory(request('name'), request('path'))){
-          return response()->json([
-              'status' => 'success',
-              'message' => 'Папка ' . request('name') . ' создана'
-          ]);
-      }
-      return response()->json([
-          'status' => 'error',
-          'message' => 'error'
-      ]);
-  }
+        return response()->json($items);
+    }
 
-  public function upload(Request $request)
-  {
-      $files = $request->file('files');
-      $path = $request->path;
-      if(Item::storeFiles($files, $path)){
-          return response()->json([
-              'status' => 'success',
-              'message' => 'Файлы успешно загружены'
-          ]);
-      }
-      return response()->json([
-          'status' => 'error',
-          'message' => 'error'
-      ]);
-  }
+    public function createDirectory()
+    {
+        if (Item::createDirectory(request('name'), request('path'))) {
+            return response()->json(
+                [
+                    'status'  => 'success',
+                    'message' => 'Папка ' . request('name') . ' создана',
+                ]
+            );
+        }
 
-  public function remove(Request $request)
-  {
-      if(Items::remove(request('paths'))){
-          return response()->json([
-              'status' => 'success',
-              'message' => '"Элементы" успешно удалены'
-          ]);
-      }
-      return response()->json([
-          'status' => 'error',
-          'message' => 'error'
-      ]);
-  }
+        return response()->json(
+            [
+                'status'  => 'error',
+                'message' => 'error',
+            ]
+        );
+    }
 
-  public function getItem($filename)
-  {
-    $item = new Item($filename);
-    return $item->responseImageOrFile();
-  }
+    public function upload(Request $request)
+    {
+        $files = $request->file('files');
+        $path  = $request->path;
+        if (Item::storeFiles($files, $path)) {
+            return response()->json(
+                [
+                    'status'  => 'success',
+                    'message' => 'Файлы успешно загружены',
+                ]
+            );
+        }
+
+        return response()->json(
+            [
+                'status'  => 'error',
+                'message' => 'error',
+            ]
+        );
+    }
+
+    public function remove(Request $request)
+    {
+        if (Items::remove(request('paths'))) {
+            return response()->json(
+                [
+                    'status'  => 'success',
+                    'message' => '"Элементы" успешно удалены',
+                ]
+            );
+        }
+
+        return response()->json(
+            [
+                'status'  => 'error',
+                'message' => 'error',
+            ]
+        );
+    }
+
+    public function getItem($filename)
+    {
+        $item = new Item($filename);
+
+        return $item->responseImageOrFile();
+    }
 }
