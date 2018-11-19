@@ -3,8 +3,6 @@
 namespace AlexMuller\Filemanager;
 
 use Illuminate\Support\ServiceProvider;
-use TCG\Voyager\Facades\Voyager;
-
 
 class AMServiceProvider extends ServiceProvider
 {
