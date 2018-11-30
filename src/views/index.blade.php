@@ -193,10 +193,11 @@
         },
         createDirectory : function () {
           var vue = this
+          var token = '{{ csrf_token() }}'
           $.ajax({
             url       : '{{ route('amfm.create-directory') }}',
             method    : 'post',
-            data      : {path: this.path, name: this.newDirectoryName},
+            data      : {path: this.path, name: this.newDirectoryName, _token: token},
             beforeSend: function () {
               vue.preloader(true)
             },
@@ -254,7 +255,7 @@
             var vue = this
             var paths = this.checked
             var token = '{{ csrf_token() }}'
-            var result = confirm('Удалить отмеченные элементы?')
+            var result = confirm('Remove selected items?')
             if (result) {
               $.ajax({
                 url       : '{{ route('amfm.remove') }}',
