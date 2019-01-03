@@ -33,7 +33,7 @@ class ItemsController extends Controller
             return response()->json(
                 [
                     'status'  => 'success',
-                    'message' => 'Папка ' . request('name') . ' создана',
+                    'message' => 'Folder ' . request('name') . ' was created',
                 ]
             );
         }
@@ -54,7 +54,7 @@ class ItemsController extends Controller
             return response()->json(
                 [
                     'status'  => 'success',
-                    'message' => 'Файлы успешно загружены',
+                    'message' => 'Files was successfully uploaded ',
                 ]
             );
         }
@@ -73,7 +73,7 @@ class ItemsController extends Controller
             return response()->json(
                 [
                     'status'  => 'success',
-                    'message' => '"Элементы" успешно удалены',
+                    'message' => '"Items" was deleted',
                 ]
             );
         }
