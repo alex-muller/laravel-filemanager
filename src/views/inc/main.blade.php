@@ -25,7 +25,7 @@
       </form>
       <div class="col-sm-7">
         <div class="input-group">
-          <input type="text" v-model="searchPhrase" value="" placeholder="Search..." class="form-control">
+          <input @keyup.enter="search" type="text" v-model="searchPhrase" value="" placeholder="Search..." class="form-control">
           <span class="input-group-btn">
             <button @click="search" type="button" data-toggle="tooltip" title="" id="button-search" class="btn btn-primary" data-original-title="Поиск"><i class="fa fa-search"></i></button>
           </span>
