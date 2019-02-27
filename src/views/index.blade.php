@@ -8,12 +8,21 @@
   <link rel="stylesheet" href="/vendor/amfm/css/bootstrap.min.css">
   <link rel="stylesheet" href="/vendor/amfm/css/bootstrap-theme.min.css">
   <link rel="stylesheet" href="/vendor/amfm/css/fontawesome-all.min.css">
-  <link rel="stylesheet" href="/vendor/amfm/css/app.css">
+
+
   <title>AM File Manager</title>
 </head>
 <body>
 @include('amfm::inc.main')
 {{--<script src="/vendor/amfm/js/vue.min.js"></script>--}}
+<script src="/vendor/amfm/js/jquery-3.3.1.min.js"></script>
+<script src="/vendor/amfm/js/bootstrap.min.js"></script>
 <script src="/vendor/amfm/js/app.js"></script>
+<script src="/vendor/amfm/js/vue.js"></script>
+<script src="/vendor/amfm/js/lodash.min.js"></script>
+
+<script>
+  window.vue = Vue
+</script>
 </body>
 </html>

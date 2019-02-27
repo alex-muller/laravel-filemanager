@@ -1,18 +1,19 @@
+<link rel="stylesheet" href="/vendor/amfm/css/app.css">
 
-<div id="app" v-cloak>
+<div id="file-manager" v-cloak>
   <div class="preloader"></div>
   <div class="section section-header">
     <div class="row">
       <div class="col-sm-5">
-        <a @click="levelUp" class="btn btn-default"><i class="fa fa-level-up-alt"></i></a>
-        <a @click="reload" class="btn btn-default"><i class="fa fa-sync-alt"></i></a>
-        <a @click="uploadFiles" class="btn btn-primary"><i class="fa fa-cloud-upload-alt"></i></a>
+        <a @click="levelUp" class="btn btn-default"><i class="fa fa-level-up"></i></a>
+        <a @click="reload" class="btn btn-default"><i class="fa fa-refresh"></i></a>
+        <a @click="uploadFiles" class="btn btn-primary"><i class="fa fa-upload"></i></a>
         <a @click="showCreateFolder" class="btn btn-default"><i class="fa fa-folder"></i></a>
-        <a @click="removeItems" class="btn btn-danger"><i class="fa fa-trash-alt"></i></a>
+        <a @click="removeItems" class="btn btn-danger"><i class="fa fa-trash"></i></a>
       </div>
       <div id="create-folder" class="create-folder-form">
         <div class="input-group">
-          <input v-model="newDirectoryName" type="text" class="form-control" placeholder="Создать папку">
+          <input v-model="newDirectoryName" type="text" class="form-control" placeholder="Create Folder">
           <span class="input-group-btn">
             <button @click="createDirectory" class="btn btn-primary" type="button">+</button>
           </span>
@@ -43,77 +44,61 @@
 
     <div v-for="chunk in chunks" class="row">
 
-      <div v-for="item in chunk" class="col-sm-2 col-xs-4 text-center item">
+      <div v-for="(item, i) in chunk" :key="i" class="col-sm-2 col-xs-4 text-center item">
         <a v-if="item.type == 'directory'" class="thumbnail" @click="changePath(item.path)"><i class="fa fa-folder fa-5x"></i></a>
         <a v-else-if="item.type == 'image'" data-type="image" :data-path="item.path" class="thumbnail"><img :src="'/{{ config('amfm.prefix') }}/' + item.path"></a>
         <a v-else class="thumbnail" data-type="file" :data-path="item.path"><i class="fa fa-file fa-5x file"></i></a>
-        <label>
+        <label v-if="!item.edit">
           <input type="checkbox" :value="item.path" v-model="checked"> @{{ item.name }}
+          <a @click.prevent="edit(item)" href="#" style="margin-left: 10px"><i class="fa fa-pencil"></i></a>
         </label>
+        <div v-else>
+          <input @keyup.enter="finishEdit(item)" type="text" v-model="item.newName">
+        </div>
       </div>
     </div>
   </div>
   <div class="section section-footer">
-    <paginator :pages="pagination.pages" :current-page="pagination.page" v-on:change="changePage"></paginator>
+    <nav v-if="pagination.pages > 1" aria-label="Page navigation" class="text-center">
+      <ul class="pagination">
+        <li>
+          <a aria-label="Previous" @click="changePage(pagination.page - 20)">
+            <span aria-hidden="true">&laquo;&laquo;</span>
+          </a>
+          <a aria-label="Previous" @click="changePage(pagination.page - 1)">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+        <li v-if="pagination.page > 5" class="disabled"><a>...</a></li>
+        <li v-for="page in pagination.pages" v-if="(pagination.page - page < 5) && (page - pagination.page < 5)" :class="{active: isActivePage(page)}"><a @click="changePage(page)">@{{ page }}</a></li>
+        <li v-if="pagination.pages - pagination.page > 4" class="disabled"><a @click="changePage(page)">...</a></li>
+        <li>
+          <a aria-label="Next" @click="changePage(pagination.page * 1 + 1)">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+          <a aria-label="Next" @click="changePage(pagination.page * 1 + 20)">
+            <span aria-hidden="true">&raquo;&raquo;</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
   </div>
 </div>
 
-<script type="text/x-template" id="paginator">
-  <nav v-if="pages > 1" aria-label="Page navigation" class="text-center">
-    <ul class="pagination">
-      <li>
-        <a aria-label="Previous" @click="goto(currentPage - 20)">
-          <span aria-hidden="true">&laquo;&laquo;</span>
-        </a>
-        <a aria-label="Previous" @click="goto(currentPage - 1)">
-          <span aria-hidden="true">&laquo;</span>
-        </a>
-      </li>
-      <li v-if="currentPage > 5" class="disabled"><a>...</a></li>
-      <li v-for="page in pages" v-if="(currentPage - page < 5) && (page - currentPage < 5)" :class="{active: isActivePage(page)}"><a @click="goto(page)">@{{ page }}</a></li>
-      <li v-if="pages - currentPage > 4" class="disabled"><a @click="goto(page)">...</a></li>
-      <li>
-        <a aria-label="Next" @click="goto(currentPage * 1 + 1)">
-          <span aria-hidden="true">&raquo;</span>
-        </a>
-        <a aria-label="Next" @click="goto(currentPage * 1 + 20)">
-          <span aria-hidden="true">&raquo;&raquo;</span>
-        </a>
-      </li>
-    </ul>
-  </nav>
-</script>
 <script>
-  window.addEventListener('load', function () {
-    /*Component Paginator*/
-    Vue.component('paginator', {
-      props   : ['pages', 'currentPage'],
-      template: $('#paginator').html(),
-      methods : {
-        goto        : function (page) {
-          if (page < 1) {
-            page = 1
-          } else if (page > this.pages) {
-            page = this.pages
-          }
-          this.$emit('change', {page: page})
-        },
-        isActivePage: function (page) {
-          return this.currentPage == page
-        }
-      }
-    })
+  function initFileManager () {
     /*Vue*/
     var vueData = {
-      items           : {},
+      items           : [],
       pagination      : {},
       path            : window.localStorage.getItem('path') ? window.localStorage.getItem('path') : '{{ config('amfm.path') }}',
       newDirectoryName: '',
       checked         : [],
       searchPhrase    : ''
     }
-    new Vue({
-      el      : '#app',
+
+    window.fileManager = new window.vue({
+      el      : '#file-manager',
       data    : vueData,
       mounted : function () {
         this.getItems(this.path)
@@ -125,6 +110,42 @@
         }
       },
       methods : {
+        edit(item) {
+          item.newName = item.name
+          item.edit = true
+        },
+        finishEdit(item) {
+          var vue = this
+          var token = '{{ csrf_token() }}'
+          $.ajax({
+            url       : '{{ route('amfm.update-item') }}',
+            method    : 'post',
+            data      : {path: this.path, name: item.name, newName: item.newName, _token: token},
+            beforeSend: function () {
+              vue.preloader(true)
+            },
+            success   : function (res) {
+              vue.preloader(false)
+              if (res.status !== 'success') {
+                alert('Error')
+              } else {
+                item.name = item.newName
+                item.edit = false
+              }
+            },
+            error: function (err) {
+              vue.preloader(false)
+              alert(err.responseJSON.message);
+              console.log(err);
+              item.edit = false
+            }
+          })
+
+          item.edit = false;
+        },
+        isActivePage: function (page) {
+          return this.pagination.page == page
+        },
         getItems        : function (path, page, search) {
           var vue = this
           var params = {}
@@ -147,7 +168,12 @@
             },
             success   : function (res) {
               vue.preloader(false)
-              vue.items = res.items
+              var items = [];
+              res.items.forEach(function (item) {
+                item.edit = false
+                items.push(item)
+              })
+              vue.items = items
               vue.pagination = res.pagination
             }
           })
@@ -159,8 +185,14 @@
             $('.preloader').removeClass('active')
           }
         },
-        changePage      : function (payload) {
-          this.getItems(this.path, payload.page, this.searchPhrase)
+        changePage      : function (page) {
+          console.log(page);
+          if (page < 1) {
+            page = 1
+          } else if (page > this.pagination.pages) {
+            page = this.pagination.pages
+          }
+          this.getItems(this.path, page, this.searchPhrase)
         },
         changePath      : function (path) {
           this.path = path
@@ -291,10 +323,13 @@
         }
       }
     })
-  })
+  }
+  if (window.vue !== undefined) {
+    document.location.reload();
+    initFileManager()
+  } else {
+    window.addEventListener('load', initFileManager)
+  }
 </script>
 
-<script src="/vendor/amfm/js/jquery-3.3.1.min.js"></script>
-<script src="/vendor/amfm/js/bootstrap.min.js"></script>
-<script src="/vendor/amfm/js/lodash.min.js"></script>
-<script src="/vendor/amfm/js/vue.js"></script>
+

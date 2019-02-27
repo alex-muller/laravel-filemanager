@@ -28,6 +28,11 @@ class Items
         return true;
     }
 
+    public static function rename($path, $newPath)
+    {
+        return Storage::move($path, $newPath);
+    }
+
     protected static function getFolders($path)
     {
         $directories = Storage::directories($path);

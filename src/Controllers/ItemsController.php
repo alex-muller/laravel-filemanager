@@ -67,6 +67,20 @@ class ItemsController extends Controller
         );
     }
 
+    public function updateItem(Request $request)
+    {
+        $path = $request->path . DIRECTORY_SEPARATOR . $request->name;
+        $newPath = $request->path . DIRECTORY_SEPARATOR . $request->newName;
+        Items::rename($path, $newPath);
+
+        return response()->json(
+            [
+                'status'  => 'success',
+                'message' => 'Item was renamed',
+            ]
+        );
+    }
+
     public function remove(Request $request)
     {
         if (Items::remove(request('paths'))) {
