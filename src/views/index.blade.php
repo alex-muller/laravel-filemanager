@@ -7,7 +7,7 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <link rel="stylesheet" href="/vendor/amfm/css/bootstrap.min.css">
   <link rel="stylesheet" href="/vendor/amfm/css/bootstrap-theme.min.css">
-  <link rel="stylesheet" href="/vendor/amfm/css/fontawesome-all.min.css">
+  <link rel="stylesheet" href="/vendor/amfm/css/font-awesome.min.css">
 
 
   <title>AM File Manager</title>
