@@ -15,7 +15,9 @@ class AMServiceProvider extends ServiceProvider
     {
         $this->loadRoutesFrom(__DIR__ . '/routes.php');
 
-        $this->loadViewsFrom(__DIR__.'/views', 'amfm');
+        $this->loadViewsFrom(__DIR__ . '/views', 'amfm');
+
+        $this->loadTranslationsFrom(__DIR__ . '/lang', 'amfm');
     }
 
     /**

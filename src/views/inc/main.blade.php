@@ -13,7 +13,7 @@
       </div>
       <div id="create-folder" class="create-folder-form">
         <div class="input-group">
-          <input v-model="newDirectoryName" type="text" class="form-control" placeholder="Create Folder">
+          <input v-model="newDirectoryName" type="text" class="form-control" placeholder="{{ __('amfm::file-manager.create_folder') }}">
           <span class="input-group-btn">
             <button @click="createDirectory" class="btn btn-primary" type="button">+</button>
           </span>
@@ -25,9 +25,9 @@
       </form>
       <div class="col-sm-7">
         <div class="input-group">
-          <input @keyup.enter="search" type="text" v-model="searchPhrase" value="" placeholder="Search..." class="form-control">
+          <input @keyup.enter="search" type="text" v-model="searchPhrase" value="" placeholder="{{ __('amfm::file-manager.search') }}..." class="form-control">
           <span class="input-group-btn">
-            <button @click="search" type="button" data-toggle="tooltip" title="" id="button-search" class="btn btn-primary" data-original-title="Поиск"><i class="fa fa-search"></i></button>
+            <button @click="search" type="button" data-toggle="tooltip" title="" id="button-search" class="btn btn-primary" data-original-title="Search"><i class="fa fa-search"></i></button>
           </span>
         </div>
       </div>
