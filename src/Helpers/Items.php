@@ -141,6 +141,4 @@ class Items
     {
         return Storage::disk('local')->getDriver()->getAdapter()->getPathPrefix() . '/' . $path;
     }
-
-
 }
