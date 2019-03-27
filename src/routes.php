@@ -2,7 +2,7 @@
 
 $namespace = 'AlexMuller\Filemanager\Controllers';
 
-Route::namespace($namespace)->prefix('amfm')->middleware('web')->name('amfm.')->group(function (){
+Route::namespace($namespace)->prefix(config('amfm.prefix'))->name('amfm.')->group(function (){
     Route::get('/', 'IndexController@index');
     Route::get('/items', 'ItemsController@getItems')->name('get-items');
     Route::get('/{item_name}', 'ItemsController@getItem')->where('item_name', '.*');

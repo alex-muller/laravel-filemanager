@@ -14,7 +14,7 @@ class ItemsController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth')->except('getItem');
+        $this->middleware(config('amfm.middleware'));
     }
 
     public function getItems()

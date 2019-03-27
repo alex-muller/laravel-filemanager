@@ -46,7 +46,7 @@
 
       <div v-for="(item, i) in chunk" :key="i" class="col-sm-2 col-xs-4 text-center item">
         <a v-if="item.type == 'directory'" class="thumbnail" @click="changePath(item.path)"><i class="fa fa-folder fa-5x"></i></a>
-        <a v-else-if="item.type == 'image'" data-type="image" :data-path="item.path" class="thumbnail"><img :src="'/{{ config('amfm.prefix') }}/' + item.path"></a>
+        <a v-else-if="item.type == 'image'" data-type="image" :data-path="item.path" class="thumbnail"><img :src="'{{ config('amfm.prefix') }}/' + item.path"></a>
         <a v-else class="thumbnail" data-type="file" :data-path="item.path"><i class="fa fa-file fa-5x file"></i></a>
         <label v-if="!item.edit">
           <input type="checkbox" :value="item.path" v-model="checked"> @{{ item.name }}
