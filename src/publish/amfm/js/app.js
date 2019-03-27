@@ -1,8 +1,8 @@
 var amfm = new function () {
 
-  this.init = function () {
-    openWindowInit();
-    multipleImageInit();
+  this.init = function (prefix) {
+    openWindowInit(prefix);
+    //multipleImageInit();
     removeImageInit();
     console.log('amfm.init');
   };
@@ -13,8 +13,8 @@ var amfm = new function () {
     })
   };
 
-  function openWindow(type, callback) {
-    var url = '/amfm';
+  function openWindow(type, url, callback) {
+    console.log(url);
     var win = window.open(url, "AMFM", "width=800,height=600");
     win.onload = function () {
       var selector = type == 'image' ? 'a[data-type=image]' : 'a[data-type]';
@@ -29,13 +29,14 @@ var amfm = new function () {
   function removeImageInit() {
     $('.amfm-image-close').click(function (e) {
       e.stopImmediatePropagation();
+
       var $scope = $(this).closest('.amfm');
-      $scope.find('.amfm-image').css('background-image', '');
+      $scope.find('.amfm-preview').css('background-image', '').removeClass('active');
       $scope.find('input').val('');
     })
   }
 
-  function openWindowInit() {    
+  function openWindowInit(prefix) {
     $('body').on('click', '.amfm-link', function () {
       var link = this;
       var type = 'file';
@@ -43,11 +44,13 @@ var amfm = new function () {
       if($(link).hasClass('amfm-image')){
         type = 'image';
       }
-      openWindow(type, function (path) {
+      openWindow(type, prefix, function (path) {
         if(type == 'image'){
-          $(link).css('background-image', 'url("/amfm/'+path+'")');
+          var $preview = $(link).closest('.amfm').find('.amfm-preview');
+          console.log($preview);
+          $preview.css('background-image', 'url("'+prefix+'/'+path+'")');
+          $preview.addClass('active')
         }
-        console.log(link);
 
         selectFile(link, path)
       })
@@ -59,7 +62,7 @@ var amfm = new function () {
   }
 
 };
-
+/*
 $(function () {
   amfm.init();
-});
+});*/
