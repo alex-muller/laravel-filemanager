@@ -7,6 +7,10 @@ var amfm = new function () {
     console.log('amfm.init');
   };
 
+  this.open = function (prefix, callback) {
+    openWindow('image', prefix, callback)
+  }
+
   this.tinyMCE = function (field, type) {
     openWindow(type, function (path) {
       return field.value = '/amfm/' + path;
