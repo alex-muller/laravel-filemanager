@@ -91,7 +91,7 @@
     var vueData = {
       items           : [],
       pagination      : {},
-      path            : window.localStorage.getItem('path') ? window.localStorage.getItem('path') : '{{ config('amfm.path') }}',
+      path            : window.localStorage.getItem('path') ? window.localStorage.getItem('path') : '',
       newDirectoryName: '',
       checked         : [],
       searchPhrase    : ''

@@ -2,55 +2,67 @@
 
 namespace AlexMuller\Filemanager\Helpers;
 
+use Illuminate\Filesystem\FilesystemManager;
 use Storage;
 
-class Items
+class ItemsManager
 {
 
-    public static function getItems($path, $page, $search)
-    {
-        $folders = self::getFolders($path);
-        $files   = self::getFiles($path);
+    /**
+     * @var FilesystemManager
+     */
+    private $storage;
 
-        return self::formatItems($folders, $files, $page, $search);
+    public function __construct()
+    {
+        /** @var FilesystemManager storage */
+        $this->storage = app(FilesystemManager::class)->disk(config('amfm.disk'));
     }
 
-    public static function remove($paths)
+    public function getItems($path, $page, $search)
+    {
+        $folders = $this->getFolders($path);
+        $files   = $this->getFiles($path);
+
+        return $this->formatItems($folders, $files, $page, $search);
+    }
+
+    public function remove($paths)
     {
         foreach ($paths as $path) {
-            if (is_file(self::storagePath($path))) {
-                Storage::delete($path);
-            } elseif (is_dir(self::storagePath($path))) {
-                Storage::deleteDirectory($path);
+            if (is_file($this->storagePath($path))) {
+                $this->storage->delete($path);
+            } elseif (is_dir($this->storagePath($path))) {
+                $this->storage->deleteDirectory($path);
             }
         }
 
         return true;
     }
 
-    public static function rename($path, $newPath)
+    public function rename($path, $newPath)
     {
-        return Storage::move($path, $newPath);
+        return $this->storage->move($path, $newPath);
     }
 
-    protected static function getFolders($path)
-    {
-        $directories = Storage::directories($path);
+    protected function getFolders($path)
+    {        
+        $directories = $this->storage->directories($path);
 
         return $directories;
     }
 
-    protected static function getFiles($path)
+    protected function getFiles($path)
     {
-        $files = Storage::files($path);
+        $files = $this->storage->files($path);
 
         return $files;
     }
 
-    protected static function formatItems($folders, $files, $page, $search)
+    protected function formatItems($folders, $files, $page, $search)
     {
-        $folders = self::searchFilter($folders, $search);
-        $files   = self::searchFilter($files, $search);
+        $folders = $this->searchFilter($folders, $search);
+        $files   = $this->searchFilter($files, $search);
 
         $all_folders_count = count($folders);
         $all_files_count   = count($files);
@@ -58,12 +70,12 @@ class Items
         $limit   = config('amfm.paging') ?: 10;
         $offset  = $limit * ($page - 1);
         $folders = array_slice($folders, $offset, $limit);
-        $folders = self::getFormatedItems($folders);
+        $folders = $this->getFormatedItems($folders);
         //files
         $file_limit  = $limit - count($folders);
         $file_offset = ($offset - $all_folders_count) > 0 ? $offset - $all_folders_count : 0;
         $files       = array_slice($files, $file_offset, $file_limit);
-        $files       = self::getFormatedItems($files);
+        $files       = $this->getFormatedItems($files);
         //pagination
         $pages = ceil(($all_folders_count + $all_files_count) / $limit);
         $items = array_merge($folders, $files);
@@ -77,7 +89,7 @@ class Items
         ];
     }
 
-    protected static function searchFilter($items, $search)
+    protected function searchFilter($items, $search)
     {
         if ($search) {
             $items = array_filter(
@@ -97,7 +109,7 @@ class Items
         return $items;
     }
 
-    protected static function getFormatedItems($items)
+    protected function getFormatedItems($items)
     {
         $items = array_map(
             function ($path) {
@@ -106,7 +118,7 @@ class Items
                 $_item = [
                     'path' => $path,
                     'name' => $name,
-                    'type' => self::getItemType($path),
+                    'type' => $this->getItemType($path),
                 ];
 
                 return $_item;
@@ -117,10 +129,10 @@ class Items
         return $items;
     }
 
-    protected static function getItemType($path)
+    protected function getItemType($path)
     {
 
-        $type = mime_content_type(self::storagePath($path));
+        $type = mime_content_type($this->storagePath($path));
 
         if ($type == 'directory') {
             return $type;
@@ -137,8 +149,24 @@ class Items
         return $type;
     }
 
-    public static function storagePath($path = '')
+    public function storagePath($path = '')
     {
-        return Storage::disk('local')->getDriver()->getAdapter()->getPathPrefix() . '/' . $path;
+        return $this->storage->getDriver()->getAdapter()->getPathPrefix() . '/' . $path;
+    }
+
+    public function createDirectory($name, $path)
+    {
+        return $this->storage->makeDirectory($path . DIRECTORY_SEPARATOR . $name);
+    }
+
+    public function storeFiles($files, $path)
+    {
+        foreach ($files as $file){
+            $name = $file->getClientOriginalName();
+            /* $ext = $file->getClientOriginalExtension();
+             $ext = $ext ? '.'.$ext : '';*/
+            $file->storeAs($path, $name);
+        }
+        return true;
     }
 }

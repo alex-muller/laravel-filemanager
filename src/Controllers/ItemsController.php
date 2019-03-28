@@ -5,6 +5,7 @@ namespace AlexMuller\Filemanager\Controllers;
 
 use AlexMuller\Filemanager\Helpers\Item;
 use AlexMuller\Filemanager\Helpers\Items;
+use AlexMuller\Filemanager\Helpers\ItemsManager;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -12,17 +13,21 @@ use App\Http\Controllers\Controller;
 class ItemsController extends Controller
 {
 
+    private $itemsManager;
+
     public function __construct()
     {
-        $this->middleware(config('amfm.middleware'));
+        $this->middleware(config('amfm.middleware'))->except('getItem');
+
+        $this->itemsManager = new ItemsManager();
     }
 
     public function getItems()
     {
-        $path   = request('path') ?: config('amfm.path');
+        $path   = request('path');
         $page   = request('page') ?: 1;
         $search = request('search') ?: '';
-        $items  = Items::getItems($path, $page, $search);
+        $items  = $this->itemsManager->getItems($path, $page, $search);
 
         return response()->json($items);
     }
@@ -71,7 +76,7 @@ class ItemsController extends Controller
     {
         $path = $request->path . DIRECTORY_SEPARATOR . $request->name;
         $newPath = $request->path . DIRECTORY_SEPARATOR . $request->newName;
-        Items::rename($path, $newPath);
+        $this->itemsManager->rename($path, $newPath);
 
         return response()->json(
             [
@@ -83,7 +88,7 @@ class ItemsController extends Controller
 
     public function remove(Request $request)
     {
-        if (Items::remove(request('paths'))) {
+        if ($this->itemsManager->remove(request('paths'))) {
             return response()->json(
                 [
                     'status'  => 'success',
