@@ -34,7 +34,7 @@ class ItemsController extends Controller
 
     public function createDirectory()
     {
-        if (Item::createDirectory(request('name'), request('path'))) {
+        if ($this->itemsManager->createDirectory(request('name'), request('path'))) {
             return response()->json(
                 [
                     'status'  => 'success',
@@ -55,7 +55,7 @@ class ItemsController extends Controller
     {
         $files = $request->file('files');
         $path  = $request->path;
-        if (Item::storeFiles($files, $path)) {
+        if ($this->itemsManager->storeFiles($files, $path)) {
             return response()->json(
                 [
                     'status'  => 'success',

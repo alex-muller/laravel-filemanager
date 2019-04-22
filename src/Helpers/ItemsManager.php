@@ -3,6 +3,7 @@
 namespace AlexMuller\Filemanager\Helpers;
 
 use Illuminate\Filesystem\FilesystemManager;
+use Illuminate\Http\UploadedFile;
 use Storage;
 
 class ItemsManager
@@ -162,10 +163,11 @@ class ItemsManager
     public function storeFiles($files, $path)
     {
         foreach ($files as $file){
+            /** @var UploadedFile $file */
             $name = $file->getClientOriginalName();
             /* $ext = $file->getClientOriginalExtension();
              $ext = $ext ? '.'.$ext : '';*/
-            $file->storeAs($path, $name);
+            $file->storeAs($path, $name, ['disk' => config('amfm.disk')]);
         }
         return true;
     }
